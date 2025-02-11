@@ -1,0 +1,50 @@
+{
+    "client1": [
+        {
+            "type": "wireguard",
+            "tag": "wg-ep",
+            "system": false,
+            "name": "wg0",
+            "mtu": 1408,
+            "address": [
+                "10.0.8.7\/32"
+            ],
+            "private_key": "",
+            "peers": [
+                {
+                    "address": "",
+                    "port": ,
+                    "public_key": "",
+                    "allowed_ips": [
+                        "10.0.8.0\/24"
+                    ],
+                    "persistent_keepalive_interval": 30
+                }
+            ]
+        }
+    ],
+    "client2": [
+        {
+            "type": "wireguard",
+            "tag": "wg-ep",
+            "system": false,
+            "name": "wg0",
+            "mtu": 1408,
+            "address": [
+                "10.0.8.2\/32"
+            ],
+            "private_key": "",
+            "peers": [
+                {
+                    "address": "",
+                    "port": ,
+                    "public_key": "",
+                    "allowed_ips": [
+                        "10.0.8.0\/24"
+                    ],
+                    "persistent_keepalive_interval": 30
+                }
+            ]
+        }
+    ]
+}
