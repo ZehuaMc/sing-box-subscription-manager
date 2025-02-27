@@ -3,592 +3,2390 @@
 <head>
   <meta charset="UTF-8">
   <title>🚀 Sing-Box 配置管理平台 🚀</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- CodeMirror CSS 和 JS -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <!-- CodeMirror CSS and JS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/codemirror.min.css">
-  <!-- 引入 material-darker 主题 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/theme/material-darker.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/theme/eclipse.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/codemirror.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/mode/javascript/javascript.min.js"></script>
-  <!-- CodeMirror runMode addon for syntax highlighting in static mode -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/addon/runmode/runmode.min.js"></script>
-  <!-- 自定义 CSS 美化页面 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/addon/edit/matchbrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/addon/edit/closebrackets.min.js"></script>
+  <!-- Animation library -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
   <style>
-    body {
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    :root {
+      /* Light mode colors */
+      --primary: #0070f3;
+      --primary-hover: #0050c0;
+      --secondary: #7928ca;
+      --accent: #ff4081;
+      --background: #f6f8fa;
+      --foreground: #111;
+      --card: #fff;
+      --card-hover: #f9fafb;
+      --border: #eaeaea;
+      --border-hover: #ddd;
+      --success: #0070f3;
+      --error: #ff4d4f;
+      --warning: #faad14;
+      --info: #1890ff;
+      --muted: #737373;
+      --surface: #f5f5f7;
+      --surface-hover: #f0f0f0;
+      --header-bg: linear-gradient(135deg, #0070f3, #8e24aa);
+      --tab-active: rgba(0, 112, 243, 0.1);
+      --toast-bg: rgba(0, 0, 0, 0.8);
+      --toast-text: #fff;
+      --link: #0070f3;
+
+      /* Shadows */
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+      --shadow-focus: 0 0 0 2px rgba(0, 112, 243, 0.2);
+      
+      /* Sizing and spacing */
+      --radius-sm: 0.375rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --radius-xl: 1rem;
+      --radius-full: 9999px;
+      
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2rem;
+      --space-2xl: 2.5rem;
+      
+      /* Typography */
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      
+      /* Animation */
+      --transition-fast: 0.15s ease;
+      --transition-normal: 0.3s ease;
+      --transition-slow: 0.5s ease;
+      
+      --header-height: 60px;
+      --footer-height: 50px;
+      --content-max-width: 1200px;
+    }
+
+    .dark-mode {
+      /* Dark mode variables */
+      --primary: #3291ff;
+      --primary-hover: #006ae6;
+      --secondary: #8a63d2;
+      --accent: #ff4081;
+      --background: #141414;
+      --foreground: #fff;
+      --card: #1f1f1f;
+      --card-hover: #252525;
+      --border: #333;
+      --border-hover: #444;
+      --muted: #888;
+      --surface: #121212;
+      --surface-hover: #1e1e1e;
+      --header-bg: linear-gradient(135deg, #0062d6, #7c2ead);
+      --tab-active: rgba(50, 145, 255, 0.15);
+      --toast-bg: rgba(255, 255, 255, 0.9);
+      --toast-text: #000;
+      --link: #3291ff;
+      
+      /* CodeMirror specific */
+      --cm-background: #1e1e1e;
+      --cm-foreground: #e0e0e0;
+      --cm-border: #333;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      background: #f0f2f5;
-      color: #333;
     }
-    header {
-      background: linear-gradient(90deg, #4CAF50, #66BB6A);
-      color: white;
-      padding: 20px;
-      text-align: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+    html, body {
+      font-family: var(--font-sans);
+      height: 100%;
+      line-height: 1.6;
+      overflow-x: hidden;
     }
-    header h1 {
-      margin: 0;
-      font-size: 2em;
+
+    body {
+      background-color: var(--background);
+      color: var(--foreground);
+      transition: background-color var(--transition-normal), color var(--transition-normal);
+      font-size: 16px;
+      width: 100%;
+      max-width: 100%;
     }
+
+    /* Typography */
+    h1, h2, h3, h4, h5, h6 {
+      font-weight: 600;
+      line-height: 1.25;
+      margin-bottom: var(--space-md);
+      color: var(--foreground);
+    }
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+    }
+
+    p {
+      margin-bottom: var(--space-md);
+    }
+
+    a {
+      color: var(--link);
+      text-decoration: none;
+      transition: color var(--transition-fast);
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* Layout */
     .container {
-      max-width: 1200px;
-      margin: 30px auto;
-      background: white;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: var(--content-max-width);
+      margin: 0 auto;
+      padding: 0 var(--space-lg);
+      overflow-x: hidden;
     }
-    .hidden {
+
+    .header {
+      position: relative;
+      background: var(--header-bg);
+      color: white;
+      padding: var(--space-lg) 0;
+      box-shadow: var(--shadow-md);
+      transition: background var(--transition-normal);
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      right: -50%;
+      bottom: -50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+      animation: pulse 20s infinite;
+      z-index: 0;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0; }
+      50% { transform: scale(1.1); opacity: 0.2; }
+      100% { transform: scale(1); opacity: 0; }
+    }
+
+    .header-content {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .header h1 {
+      margin: 0;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      animation: fadeInDown 0.8s ease-out;
+    }
+
+    .main-content {
+      padding: var(--space-xl) 0;
+      min-height: calc(100vh - var(--header-height) - var(--footer-height));
+      overflow-x: hidden;
+    }
+
+    /* Cards */
+    .card {
+      background-color: var(--card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: var(--space-xl);
+      overflow: hidden;
+      transition: all var(--transition-normal);
+      border: 1px solid var(--border);
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .card-header {
+      padding: var(--space-lg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-header h2, .card-header h3 {
+      margin-bottom: 0;
+    }
+
+    .card-body {
+      padding: var(--space-lg);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem 1.25rem;
+      background-color: var(--primary);
+      color: white;
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      border: none;
+      font-size: 0.95rem;
+      height: 2.5rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: -100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: 0.5s;
+    }
+
+    .btn:hover {
+      background-color: var(--primary-hover);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .btn:hover::after {
+      left: 100%;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-danger {
+      background-color: var(--error);
+    }
+
+    .btn-danger:hover {
+      background-color: #d9363e;
+    }
+
+    .btn-sm {
+      height: 2rem;
+      padding: 0 0.75rem;
+      font-size: 0.85rem;
+    }
+
+    .btn-lg {
+      height: 3rem;
+      padding: 0 1.5rem;
+      font-size: 1.1rem;
+    }
+
+    .btn-icon {
+      width: 2.5rem;
+      padding: 0;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: var(--space-sm);
+    }
+
+    /* Advanced buttons for endpoint actions */
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      border: none;
+      height: 2.2rem;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .action-btn.edit {
+      background-color: var(--primary);
+      color: white;
+    }
+    
+    .action-btn.edit:hover {
+      background-color: var(--primary-hover);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .action-btn.delete {
+      background-color: var(--error);
+      color: white;
+    }
+    
+    .action-btn.delete:hover {
+      background-color: #d9363e;
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Icons */
+    .icon {
+      width: 1.25rem;
+      height: 1.25rem;
+      stroke-width: 2;
+      margin-right: 0.5rem;
+    }
+
+    .icon-only {
+      margin-right: 0;
+    }
+
+    /* Forms */
+    .form-group {
+      margin-bottom: var(--space-lg);
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: var(--space-sm);
+      font-weight: 500;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      font-size: 1rem;
+      line-height: 1.5;
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      transition: all var(--transition-fast);
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: var(--shadow-focus);
+    }
+
+    textarea.form-control {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    /* Custom file input styling */
+    .file-input-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .file-input {
+      position: absolute;
+      left: -9999px;
+      opacity: 0;
+      width: 0.1px;
+      height: 0.1px;
+      overflow: hidden;
+    }
+
+    .file-input-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.8rem 1rem;
+      background-color: var(--surface);
+      color: var(--foreground);
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      border: 1px dashed var(--border);
+      text-align: center;
+      margin-bottom: var(--space-md);
+    }
+
+    .file-input-label:hover {
+      background-color: var(--surface-hover);
+      border-color: var(--border-hover);
+    }
+
+    .file-input-label span {
+      display: flex;
+      align-items: center;
+    }
+
+    .file-input-label svg {
+      margin-right: 8px;
+    }
+
+    .file-name-display {
+      margin-top: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      background-color: var(--card);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
       display: none;
+      align-items: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
+
+    .file-name-display.active {
+      display: flex;
+    }
+
+    .file-name-clear {
+      margin-left: auto;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: var(--surface);
+      color: var(--muted);
+      transition: all var(--transition-fast);
+    }
+
+    .file-name-clear:hover {
+      background-color: var(--error);
+      color: white;
+    }
+
+    /* Tabs */
     .tabs {
       display: flex;
-      border-bottom: 2px solid #ccc;
-      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: var(--space-lg);
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      scroll-behavior: smooth;
+      position: relative;
     }
-    .tab {
-      padding: 12px 24px;
-      cursor: pointer;
-      background: #e0e0e0;
-      margin-right: 2px;
-      border-top-left-radius: 5px;
-      border-top-right-radius: 5px;
-      transition: background 0.3s;
-    }
-    .tab:hover {
-      background: #d5d5d5;
-    }
-    .tab.active {
-      background: white;
-      border: 2px solid #ccc;
-      border-bottom: none;
-    }
-    .section {
+
+    .tabs::-webkit-scrollbar {
       display: none;
     }
-    .section.active {
+
+    .tab {
+      padding: 0.75rem 1.25rem;
+      cursor: pointer;
+      font-weight: 500;
+      position: relative;
+      white-space: nowrap;
+      color: var(--muted);
+      transition: color var(--transition-fast);
+    }
+
+    .tab:hover {
+      color: var(--foreground);
+    }
+
+    .tab.active {
+      color: var(--primary);
+      background-color: var(--tab-active);
+      border-radius: var(--radius-md) var(--radius-md) 0 0;
+    }
+
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 2px;
+      background-color: var(--primary);
+      animation: slideInLeft 0.3s ease-out forwards;
+    }
+
+    @keyframes slideInLeft {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .tab-content.active {
       display: block;
     }
-    .btn {
-      background: #4CAF50;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      margin: 5px 0;
-      cursor: pointer;
-      border-radius: 4px;
-      transition: background-color 0.3s;
-      font-size: 1em;
+
+    /* Tables */
+    .table-container {
+      overflow-x: auto;
+      border-radius: var(--radius-md);
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      max-width: 100%;
     }
-    .btn:hover {
-      background: #45a049;
-    }
-    input[type="text"], input[type="password"], textarea, select {
-      padding: 10px;
-      width: 100%;
-      box-sizing: border-box;
-      margin: 5px 0 15px 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 1em;
-    }
-    textarea {
-      resize: vertical;
-      min-height: 150px;
-    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 15px;
+      table-layout: fixed;
     }
-    table, th, td {
-      border: 1px solid #ccc;
-    }
+
     th, td {
-      padding: 12px;
+      padding: 0.75rem 1rem;
       text-align: left;
     }
+
     th {
-      background-color: #f2f2f2;
+      background-color: var(--surface);
+      font-weight: 600;
+      color: var(--foreground);
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
-    pre {
+
+    tr:not(:last-child) td {
+      border-bottom: 1px solid var(--border);
+    }
+
+    tr:hover td {
+      background-color: var(--surface-hover);
+    }
+
+    /* Data cards for mobile display */
+    .data-card {
+      background-color: var(--card);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: var(--space-md);
+      padding: var(--space-md);
+      border: 1px solid var(--border);
+      transition: all var(--transition-normal);
+    }
+
+    .data-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-hover);
+    }
+
+    .data-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-sm);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .data-card-title {
+      font-weight: 600;
       margin: 0;
-      font-family: "Courier New", Courier, monospace;
-      font-size: 0.95em;
     }
-    .raw-link {
-      font-size: 1.1em;
-      margin-top: 10px;
-      background: #f9f9f9;
-      padding: 10px;
-      border: 1px dashed #ccc;
-      word-break: break-all;
-      border-radius: 4px;
+
+    .data-card-content {
+      margin-bottom: var(--space-md);
     }
-    /* 设置 CodeMirror 编辑器高度 */
+
+    .data-card-actions {
+      display: flex;
+      gap: var(--space-sm);
+    }
+
+    /* CodeMirror customization */
+    .editor-container {
+      position: relative;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      height: 400px;
+      margin-bottom: var(--space-md);
+    }
+
+    .editor-container.fullscreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1000;
+      background-color: var(--background);
+      padding: var(--space-lg);
+      margin: 0;
+      border-radius: 0;
+    }
+
     .CodeMirror {
-      height: 500px;
-      font-size: 14px;
+      height: 100%;
+      font-family: var(--font-mono);
+      line-height: 1.6;
+      border-radius: var(--radius-md);
+      transition: all var(--transition-normal);
+    }
+
+    /* Desktop font size for CodeMirror */
+    @media (min-width: 769px) {
+      .CodeMirror {
+        font-size: 12px;
+      }
+    }
+
+    /* Mobile font size for CodeMirror */
+    @media (max-width: 768px) {
+      .CodeMirror {
+        font-size: 12px;
+      }
+    }
+
+    .dark-mode .CodeMirror {
+      box-shadow: none;
+    }
+
+    .editor-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      padding: var(--space-sm);
+      background-color: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+
+    .fullscreen-toggle {
+      position: absolute;
+      top: var(--space-sm);
+      right: var(--space-sm);
+      z-index: 100;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color var(--transition-fast);
+      border: none;
+      font-size: 1.1rem;
+    }
+
+    .fullscreen-toggle:hover {
+      background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    /* Theme toggle - Repositioned to navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-md);
+      position: sticky;
+      top: 0;
+      background-color: var(--background);
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: transparent;
+      color: var(--foreground);
+      border: 1px solid var(--border);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      z-index: 10;
+    }
+
+    .theme-toggle:hover {
+      background-color: var(--surface-hover);
+      border-color: var(--border-hover);
+    }
+
+    /* Toast notifications */
+    .toast-container {
+      position: fixed;
+      top: var(--space-lg);
+      right: var(--space-lg);
+      z-index: 9999;
+    }
+
+    .toast {
+      background-color: var(--toast-bg);
+      color: var(--toast-text);
+      padding: var(--space-md) var(--space-lg);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-sm);
+      display: flex;
+      align-items: center;
+      box-shadow: var(--shadow-md);
+      transform: translateX(120%);
+      transition: transform var(--transition-normal);
+      max-width: 350px;
+      opacity: 0.98;
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+
+    .toast-icon {
+      margin-right: var(--space-md);
+      font-size: 1.5rem;
+    }
+
+    .toast.success .toast-icon {
+      color: var(--success);
+    }
+
+    .toast.error .toast-icon {
+      color: var(--error);
+    }
+
+    .toast.warning .toast-icon {
+      color: var(--warning);
+    }
+
+    /* Loader */
+    .loader-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      backdrop-filter: blur(5px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-normal);
+    }
+
+    .loader-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .loader {
+      width: 48px;
+      height: 48px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Mobile action bar */
+    .mobile-action-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: var(--card);
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+      padding: var(--space-sm);
+      display: none;
+      gap: var(--space-sm);
+      z-index: 900;
+      transition: transform var(--transition-normal);
+      transform: translateY(100%);
+    }
+
+    .mobile-action-bar.active {
+      transform: translateY(0);
+    }
+
+    /* Code content container */
+    .code-content {
+      background-color: var(--surface);
+      border-radius: var(--radius-md);
+      padding: var(--space-sm);
+      margin-bottom: var(--space-md);
+      max-height: 150px;
+      overflow-y: auto;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    /* Mobile specific styles */
+    @media (max-width: 768px) {
+      html, body {
+        font-size: 15px;
+      }
+      
+      .container {
+        padding: 0 var(--space-md);
+      }
+      
+      .header h1 {
+        font-size: 1.5rem;
+      }
+      
+      .main-content {
+        padding: var(--space-md) 0 calc(var(--space-md) + var(--footer-height));
+      }
+      
+      .card {
+        border-radius: var(--radius-md);
+        margin-bottom: var(--space-lg);
+      }
+      
+      .card-header, .card-body {
+        padding: var(--space-md);
+      }
+      
+      .form-group {
+        margin-bottom: var(--space-md);
+      }
+      
+      .btn-group {
+        flex-wrap: wrap;
+      }
+      
+      .mobile-action-bar {
+        display: flex;
+      }
+      
+      .action-btn-desktop {
+        display: none;
+      }
+      
+      .tab {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+      }
+      
+      .editor-container {
+        height: 300px;
+      }
+      
+      /* Hide tables on mobile and show cards instead */
+      .mobile-hide {
+        display: none;
+      }
+      
+      .mobile-show {
+        display: block;
+      }
+      
+      /* Make fullscreen editor better on mobile */
+      .editor-container.fullscreen .CodeMirror {
+        font-size: 10px !important;
+        line-height: 1.6;
+      }
+      
+      .fullscreen-toolbar {
+        padding: var(--space-sm);
+      }
+    }
+
+    /* Hide mobile cards on desktop */
+    .mobile-show {
+      display: none;
+    }
+
+    /* Dark mode CodeMirror overrides */
+    .dark-mode .CodeMirror {
+      background-color: var(--cm-background);
+      color: var(--cm-foreground);
+      border-color: var(--cm-border);
+    }
+
+    .dark-mode .CodeMirror-gutters {
+      background-color: #1a1a1a;
+      border-color: var(--cm-border);
+    }
+
+    .dark-mode .CodeMirror-linenumber {
+      color: #606060;
+    }
+
+    /* Utility classes */
+    .hidden {
+      display: none !important;
+    }
+    
+    .d-flex {
+      display: flex;
+    }
+    
+    .flex-column {
+      flex-direction: column;
+    }
+    
+    .justify-content-between {
+      justify-content: space-between;
+    }
+    
+    .align-items-center {
+      align-items: center;
+    }
+    
+    .flex-wrap {
+      flex-wrap: wrap;
+    }
+    
+    .gap-sm {
+      gap: var(--space-sm);
+    }
+    
+    .gap-md {
+      gap: var(--space-md);
+    }
+    
+    .mb-sm {
+      margin-bottom: var(--space-sm);
+    }
+    
+    .mb-md {
+      margin-bottom: var(--space-md);
+    }
+    
+    .mb-lg {
+      margin-bottom: var(--space-lg);
+    }
+    
+    .mt-sm {
+      margin-top: var(--space-sm);
+    }
+    
+    .mt-md {
+      margin-top: var(--space-md);
+    }
+    
+    .mt-lg {
+      margin-top: var(--space-lg);
+    }
+    
+    .mr-sm {
+      margin-right: var(--space-sm);
+    }
+    
+    .ml-sm {
+      margin-left: var(--space-sm);
+    }
+    
+    .text-center {
+      text-align: center;
+    }
+    
+    .w-100 {
+      width: 100%;
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .fade-in-up {
+      animation: fadeInUp 0.5s ease-out;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>🚀 Sing-Box 配置管理平台 🚀</h1>
-  </header>
-  <div class="container">
-    <!-- 登录区域 -->
-    <div id="login-section">
-      <h2>🔒 请登录</h2>
-      <input type="password" id="login-password" placeholder="请输入登录密码">
-      <button class="btn" onclick="login()">登录</button>
+  <!-- Loader -->
+  <div class="loader-overlay" id="loader">
+    <div class="loader"></div>
+  </div>
+  
+  <!-- Toast notifications -->
+  <div class="toast-container" id="toast-container"></div>
+  
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <h1>🚀 Sing-Box 配置管理平台 🚀</h1>
+      </div>
     </div>
-    <!-- 主管理区域 -->
-    <div id="main-section" class="hidden">
-      <!-- 标签导航 -->
-      <div class="tabs">
-        <div class="tab active" data-tab="config">📝 配置编辑</div>
-        <div class="tab" data-tab="endpoints">🔌 Endpoints 管理</div>
-        <div class="tab" data-tab="history">📜 历史版本管理</div>
-      </div>
-      <!-- 各标签对应的内容区域 -->
-      <div id="config" class="section active">
-        <h2>📝 配置编辑</h2>
-        <!-- 配置编辑区域使用 CodeMirror 编辑器，支持格式化 -->
-        <textarea id="config-editor" placeholder="加载配置中..."></textarea>
-        <div style="margin-bottom: 10px;">
-          <button class="btn" onclick="saveConfig()">💾 保存配置</button>
-          <button class="btn" onclick="formatConfig()">🔧 格式化 JSON</button>
+  </header>
+  
+  <!-- Navbar with theme toggle -->
+  <nav class="navbar">
+    <div class="container d-flex justify-content-between align-items-center">
+      <div></div> <!-- Placeholder for balance -->
+      <button id="theme-toggle" class="theme-toggle" aria-label="切换主题">🌙</button>
+    </div>
+  </nav>
+  
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container">
+      <!-- Login Section -->
+      <div id="login-section" class="card fade-in-up">
+        <div class="card-body text-center">
+          <h2>🔒 请登录</h2>
+          <div class="form-group">
+            <input type="password" id="login-password" class="form-control" placeholder="请输入登录密码" autocomplete="current-password">
+          </div>
+          <button class="btn" id="login-btn">登录</button>
         </div>
-        <input type="file" id="upload-config" accept=".json">
-        <button class="btn" onclick="uploadConfig()">📤 上传配置文件</button>
-        <hr>
-        <h3>🔗 Raw 链接生成</h3>
-        <p>请输入 Raw 访问密码：</p>
-        <input type="password" id="raw-password" placeholder="Raw访问密码">
-        <p>选择 Endpoints（可选）：</p>
-        <select id="raw-endpoint">
-          <option value="">不替换</option>
-        </select>
-        <button class="btn" onclick="generateRawLink()">生成 Raw 链接</button>
-        <div id="raw-link-display" class="raw-link"></div>
       </div>
-      <div id="endpoints" class="section">
-        <h2>🔌 Endpoints 管理</h2>
-        <button class="btn" onclick="loadEndpoints()">🔄 刷新列表</button>
-        <table id="endpoints-table">
-          <thead>
-            <tr>
-              <th>Key</th>
-              <th>配置内容</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- 由 JS 动态生成列表 -->
-          </tbody>
-        </table>
-        <hr>
-        <h3>➕ 添加 / 修改 Endpoints</h3>
-        <p>Key: <input type="text" id="endpoint-key" placeholder="例如：default"></p>
-        <p>Endpoints JSON 内容:</p>
-        <textarea id="endpoint-content" placeholder='例如: [{"type": "wireguard", ...}]'></textarea>
-        <button class="btn" onclick="saveEndpoint()">💾 保存 Endpoints</button>
-        <button class="btn" onclick="clearEndpointForm()">🧹 清空</button>
+      
+      <!-- Main Management Section -->
+      <div id="main-section" class="hidden">
+        <!-- Tabs Navigation -->
+        <div class="tabs" id="main-tabs">
+          <div class="tab active" data-tab="config">📝 配置编辑</div>
+          <div class="tab" data-tab="endpoints">🔌 Endpoints</div>
+          <div class="tab" data-tab="history">📜 历史版本</div>
+        </div>
+        
+        <!-- Config Tab -->
+        <div id="config-tab" class="tab-content active">
+          <div class="card fade-in">
+            <div class="card-header">
+              <h2>📝 配置编辑</h2>
+            </div>
+            <div class="card-body">
+              <div class="editor-container" id="config-editor-container">
+                <textarea id="config-editor" placeholder="加载配置中..."></textarea>
+                <button class="fullscreen-toggle" id="config-fullscreen" aria-label="全屏编辑">⛶</button>
+              </div>
+              <div class="d-flex gap-sm flex-wrap action-btn-desktop">
+                <button class="btn" id="save-config-btn">
+                  <span>💾 保存配置</span>
+                </button>
+                <button class="btn" id="format-config-btn">
+                  <span>🔧 格式化 JSON</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card fade-in">
+            <div class="card-header">
+              <h3>📤 上传配置文件</h3>
+            </div>
+            <div class="card-body">
+              <div class="file-input-container">
+                <input type="file" id="upload-config" class="file-input" accept=".json">
+                <label for="upload-config" class="file-input-label">
+                  <span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="17 8 12 3 7 8"></polyline>
+                      <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    选择文件
+                  </span>
+                </label>
+                <div id="file-name-display" class="file-name-display">
+                  <span id="selected-file-name">No file selected</span>
+                  <span id="clear-file-selection" class="file-name-clear">×</span>
+                </div>
+              </div>
+              <button class="btn" id="upload-config-btn">
+                <span>📤 上传配置文件</span>
+              </button>
+            </div>
+          </div>
+          
+          <div class="card fade-in">
+            <div class="card-header">
+              <h3>🔗 Raw 链接生成</h3>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label">请输入 Raw 访问密码：</label>
+                <input type="password" id="raw-password" class="form-control" placeholder="Raw 访问密码">
+              </div>
+              <div class="form-group">
+                <label class="form-label">选择 Endpoints（可选）：</label>
+                <select id="raw-endpoint" class="form-control">
+                  <option value="">不替换</option>
+                </select>
+              </div>
+              <button class="btn" id="generate-raw-link-btn">
+                <span>生成 Raw 链接</span>
+              </button>
+              <div id="raw-link-display" class="form-group mt-md" style="display: none;">
+                <div class="form-control" style="word-break: break-all; min-height: 60px; font-family: var(--font-mono); white-space: normal; padding: var(--space-md);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Endpoints Tab -->
+        <div id="endpoints-tab" class="tab-content">
+          <div class="card fade-in">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h2>🔌 Endpoints 管理</h2>
+              <button class="btn" id="refresh-endpoints-btn">
+                <span>🔄 刷新列表</span>
+              </button>
+            </div>
+            <div class="card-body">
+              <!-- Desktop table view -->
+              <div class="table-container table-responsive mb-lg mobile-hide">
+                <table id="endpoints-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 20%">Key</th>
+                      <th style="width: 60%">配置内容</th>
+                      <th style="width: 20%">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td colspan="3" class="text-center">加载中...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+              <!-- Mobile card view -->
+              <div id="endpoints-cards" class="mobile-show">
+                <div class="text-center">加载中...</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card fade-in">
+            <div class="card-header">
+              <h3>➕ 添加 / 修改 Endpoints</h3>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label">Key:</label>
+                <input type="text" id="endpoint-key" class="form-control" placeholder="例如：default">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Endpoints JSON 内容:</label>
+                <div class="editor-container" id="endpoint-editor-container">
+                  <textarea id="endpoint-content" placeholder='例如: [{"type": "wireguard", ...}]'></textarea>
+                  <button class="fullscreen-toggle" id="endpoint-fullscreen" aria-label="全屏编辑">⛶</button>
+                </div>
+              </div>
+              
+              <div class="d-flex gap-sm flex-wrap">
+                <button class="btn" id="save-endpoint-btn">
+                  <span>💾 保存 Endpoints</span>
+                </button>
+                <button class="btn btn-outline" id="clear-endpoint-btn">
+                  <span>🧹 清空</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- History Tab -->
+        <div id="history-tab" class="tab-content">
+          <div class="card fade-in">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h2>📜 历史版本管理</h2>
+              <button class="btn" id="refresh-history-btn">
+                <span>🔄 刷新历史列表</span>
+              </button>
+            </div>
+            <div class="card-body">
+              <!-- Desktop table view -->
+              <div class="table-container table-responsive mobile-hide">
+                <table id="history-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 70%">文件名</th>
+                      <th style="width: 30%">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td colspan="2" class="text-center">加载中...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+              <!-- Mobile card view -->
+              <div id="history-cards" class="mobile-show">
+                <div class="text-center">加载中...</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div id="history" class="section">
-        <h2>📜 历史版本管理</h2>
-        <button class="btn" onclick="loadHistory()">🔄 刷新历史列表</button>
-        <table id="history-table">
-          <thead>
-            <tr>
-              <th>文件名</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- 由 JS 动态生成历史版本列表 -->
-          </tbody>
-        </table>
-      </div>
+    </div>
+  </main>
+  
+  <!-- Mobile Action Bar -->
+  <div class="mobile-action-bar" id="config-actions">
+    <button class="btn" id="mobile-save-btn">💾 保存</button>
+    <button class="btn" id="mobile-format-btn">🔧 格式化</button>
+    <button class="btn" id="mobile-fullscreen-btn">📱 全屏编辑</button>
+  </div>
+  
+  <!-- Fullscreen Editor Modal -->
+  <div class="editor-container fullscreen hidden" id="fullscreen-editor">
+    <div class="d-flex justify-content-between align-items-center mb-md">
+      <h3 id="fullscreen-title">全屏编辑器</h3>
+      <button class="btn" id="exit-fullscreen-btn">退出全屏</button>
+    </div>
+    <div id="fullscreen-editor-container" style="height: calc(100% - 110px);"></div>
+    <div class="fullscreen-toolbar d-flex justify-content-end gap-sm mt-md">
+      <button class="btn" id="fullscreen-save-btn">保存</button>
+      <button class="btn" id="fullscreen-format-btn">格式化 JSON</button>
     </div>
   </div>
-
-  <!-- CodeMirror 与各功能 JS 脚本 -->
+  
   <script>
-    let editor;
-    let currentConfig = "";
-    // 切换标签页时，根据 tabId 切换内容，同时若切换到 endpoints 标签则自动加载 endpoints 列表，
-    // 切换到配置编辑标签时则加载 Raw 下拉菜单（Endpoints列表），切换到历史版本管理则自动加载历史文件。
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-      });
-      document.querySelectorAll('.section').forEach(section => {
-        section.classList.remove('active');
-      });
-      document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
-      document.getElementById(tabId).classList.add('active');
-      if (tabId === "endpoints") {
-        loadEndpoints();
-      } else if (tabId === "config") {
-        loadRawEndpoints();
-      } else if (tabId === "history") {
-        loadHistory();
-      }
-    }
-
-    document.querySelectorAll('.tab').forEach(tab => {
-      tab.addEventListener('click', function() {
-        switchTab(this.getAttribute('data-tab'));
-      });
-    });
-
-    function login() {
-      const password = document.getElementById("login-password").value;
-      fetch('login.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({password: password})
-      })
-      .then(response => response.json())
-      .then(data => {
-        if(data.success) {
-          document.getElementById("login-section").classList.add('hidden');
-          document.getElementById("main-section").classList.remove('hidden');
-          loadConfig();
-          loadRawEndpoints();
+    document.addEventListener('DOMContentLoaded', function() {
+      // Global variables
+      let configEditor, endpointEditor, fullscreenEditor;
+      let currentConfig = "";
+      let isInFullscreenMode = false;
+      let currentFullscreenSource = null;
+      let isDarkMode = false;
+      
+      // DOM elements - moved inside DOMContentLoaded to ensure they exist
+      const loader = document.getElementById('loader');
+      const themeToggle = document.getElementById('theme-toggle');
+      const loginSection = document.getElementById('login-section');
+      const mainSection = document.getElementById('main-section');
+      const mainTabs = document.querySelectorAll('.tab');
+      const configTab = document.getElementById('config-tab');
+      const endpointsTab = document.getElementById('endpoints-tab');
+      const historyTab = document.getElementById('history-tab');
+      const fullscreenEditorElement = document.getElementById('fullscreen-editor');
+      const mobileActionBar = document.getElementById('config-actions');
+      
+      // Custom file input handling
+      const fileInput = document.getElementById('upload-config');
+      const fileNameDisplay = document.getElementById('file-name-display');
+      const selectedFileName = document.getElementById('selected-file-name');
+      const clearFileSelection = document.getElementById('clear-file-selection');
+      
+      fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+          selectedFileName.textContent = this.files[0].name;
+          fileNameDisplay.classList.add('active');
         } else {
-          alert("❌ 登录失败，密码错误。");
+          fileNameDisplay.classList.remove('active');
         }
-      })
-      .catch(err => console.error("登录错误:", err));
-    }
-
-    function loadConfig() {
-      fetch('get_config.php')
-      .then(response => response.json())
-      .then(data => {
-        currentConfig = JSON.stringify(data, null, 4);
-        if (!editor) {
-          const textarea = document.getElementById("config-editor");
-          textarea.value = currentConfig;
-          editor = CodeMirror.fromTextArea(textarea, {
+      });
+      
+      clearFileSelection.addEventListener('click', function(e) {
+        e.preventDefault();
+        fileInput.value = '';
+        fileNameDisplay.classList.remove('active');
+      });
+      
+      // Detect mobile device
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      
+      // Show/hide mobile action bar based on device
+      if (isMobile) {
+        mobileActionBar.classList.add('active');
+        document.querySelectorAll('.mobile-hide').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.mobile-show').forEach(el => el.style.display = 'block');
+      } else {
+        document.querySelectorAll('.mobile-hide').forEach(el => el.style.display = 'block');
+        document.querySelectorAll('.mobile-show').forEach(el => el.style.display = 'none');
+      }
+      
+      // Utility functions
+      function showLoader() {
+        loader.classList.add('active');
+      }
+      
+      function hideLoader() {
+        loader.classList.remove('active');
+      }
+      
+      function showToast(message, type = 'success') {
+        const toastContainer = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        const icon = type === 'success' ? '✓' : type === 'error' ? '✗' : '⚠️';
+        toast.innerHTML = `
+          <div class="toast-icon">${icon}</div>
+          <div class="toast-message">${message}</div>
+        `;
+        
+        toastContainer.appendChild(toast);
+        
+        // Show the toast after a small delay to allow CSS transition to work
+        setTimeout(() => toast.classList.add('show'), 10);
+        
+        // Remove the toast after a delay
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+      
+      // Theme toggle
+      function toggleTheme() {
+        isDarkMode = !isDarkMode;
+        document.body.classList.toggle('dark-mode', isDarkMode);
+        themeToggle.textContent = isDarkMode ? '☀️' : '🌙';
+        
+        // Update CodeMirror theme
+        const theme = isDarkMode ? 'material-darker' : 'eclipse';
+        if (configEditor) configEditor.setOption('theme', theme);
+        if (endpointEditor) endpointEditor.setOption('theme', theme);
+        if (fullscreenEditor) fullscreenEditor.setOption('theme', theme);
+        
+        // Save preference
+        localStorage.setItem('darkMode', isDarkMode ? 'true' : 'false');
+      }
+      
+      // Check for saved theme preference
+      function initTheme() {
+        const savedTheme = localStorage.getItem('darkMode');
+        if (savedTheme === 'true') {
+          isDarkMode = false; // Will be toggled to true
+          toggleTheme();
+        }
+      }
+      
+      // Tab switching
+      function switchTab(tabId) {
+        // Update tab states
+        mainTabs.forEach(tab => {
+          tab.classList.toggle('active', tab.getAttribute('data-tab') === tabId);
+        });
+        
+        // Update content visibility
+        document.querySelectorAll('.tab-content').forEach(content => {
+          content.classList.remove('active');
+        });
+        
+        // Show active content
+        const activeTabContent = document.getElementById(`${tabId}-tab`);
+        if (activeTabContent) {
+          activeTabContent.classList.add('active', 'fade-in');
+          setTimeout(() => activeTabContent.classList.remove('fade-in'), 300);
+        }
+        
+        // Handle mobile action bar visibility
+        if (isMobile) {
+          mobileActionBar.classList.toggle('active', tabId === 'config');
+        }
+        
+        // Load content based on tab
+        if (tabId === 'endpoints') {
+          loadEndpoints();
+          initEndpointEditor();
+        } else if (tabId === 'config') {
+          loadRawEndpoints();
+          if (configEditor) setTimeout(() => configEditor.refresh(), 10);
+        } else if (tabId === 'history') {
+          loadHistory();
+        }
+      }
+      
+      // Initialize CodeMirror editors
+      function initConfigEditor() {
+        if (!configEditor) {
+          const editorElement = document.getElementById('config-editor');
+          configEditor = CodeMirror.fromTextArea(editorElement, {
             mode: 'application/json',
             lineNumbers: true,
             matchBrackets: true,
-            theme: 'material-darker',
+            autoCloseBrackets: true,
+            theme: isDarkMode ? 'material-darker' : 'eclipse',
             tabSize: 2,
             lineWrapping: true,
             viewportMargin: Infinity
           });
-        } else {
-          editor.setValue(currentConfig);
-        }
-      })
-      .catch(err => console.error("加载配置错误:", err));
-    }
-
-    function saveConfig() {
-      let configData = editor.getValue();
-      try {
-        JSON.parse(configData);
-      } catch(e) {
-        alert("❌ 配置内容不是有效的 JSON 格式");
-        return;
-      }
-      fetch('save_json.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({json: configData})
-      })
-      .then(response => response.json())
-      .then(data => {
-        if(data.success) {
-          alert("✅ 配置保存成功！");
-          loadConfig();
-        } else {
-          alert("❌ 保存失败：" + data.error);
-        }
-      })
-      .catch(err => console.error("保存配置错误:", err));
-    }
-
-    // 新增函数：格式化 JSON
-    function formatConfig() {
-      let configData = editor.getValue();
-      try {
-        let parsed = JSON.parse(configData);
-        editor.setValue(JSON.stringify(parsed, null, 4));
-      } catch(e) {
-        alert("❌ 当前内容不是有效的 JSON 格式，无法格式化");
-      }
-    }
-
-    function uploadConfig() {
-      const fileInput = document.getElementById("upload-config");
-      if(fileInput.files.length === 0) {
-        alert("❌ 请选择一个配置文件进行上传。");
-        return;
-      }
-      const file = fileInput.files[0];
-      const formData = new FormData();
-      formData.append('jsonFile', file);
-      fetch('upload_json.php', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => response.json())
-      .then(data => {
-        if(data.success) {
-          alert("✅ 配置文件上传成功！");
-          loadConfig();
-        } else {
-          alert("❌ 上传失败：" + data.error);
-        }
-      })
-      .catch(err => console.error("上传配置错误:", err));
-    }
-
-    // Raw 链接生成相关
-    function loadRawEndpoints() {
-      // 通过 endpoints_manager.php 的 list 接口加载所有 endpoints key，用于 Raw 链接下拉菜单
-      fetch('endpoints_manager.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({action: 'list'})
-      })
-      .then(response => response.json())
-      .then(data => {
-        if(data.success) {
-          let select = document.getElementById("raw-endpoint");
-          select.innerHTML = '<option value="">不替换</option>';
-          for(let key in data.endpoints) {
-            let option = document.createElement("option");
-            option.value = key;
-            option.innerText = key;
-            select.appendChild(option);
+          
+          // Optimize for mobile
+          if (isMobile) {
+            configEditor.setOption('lineWrapping', true);
           }
-        } else {
-          console.error("加载 Raw endpoints 失败：" + data.error);
         }
-      })
-      .catch(err => console.error("加载 Raw endpoints 错误:", err));
-    }
-
-    function generateRawLink() {
-      const rawPwd = document.getElementById("raw-password").value;
-      if(!rawPwd) {
-        alert("❌ 请输入 Raw 访问密码");
-        return;
       }
-      // 固定配置文件名为 config.json，完整 URL 显示
-      let rawLink = "https://sing-box.200502.xyz/raw.php?pwd=" + encodeURIComponent(rawPwd) + "&file=config.json";
-      const selectedEp = document.getElementById("raw-endpoint").value;
-      if(selectedEp) {
-        rawLink += "&ep=" + encodeURIComponent(selectedEp);
-      }
-      document.getElementById("raw-link-display").innerText = rawLink;
-    }
-
-    // Endpoints 管理相关
-    function loadEndpoints() {
-      fetch('endpoints_manager.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({action: 'list'})
-      })
-      .then(response => response.json())
-      .then(data => {
-        if(data.success) {
-          let tbody = document.querySelector("#endpoints-table tbody");
-          tbody.innerHTML = "";
-          for(let key in data.endpoints) {
-            let tr = document.createElement("tr");
-            
-            let tdKey = document.createElement("td");
-            tdKey.innerText = key;
-            
-            let tdContent = document.createElement("td");
-            // 创建预格式化的代码块，使用 CodeMirror.runMode 进行高亮
-            let pre = document.createElement("pre");
-            pre.style.backgroundColor = "#f6f8fa";
-            pre.style.padding = "10px";
-            pre.style.borderRadius = "4px";
-            pre.style.overflowX = "auto";
-            let code = document.createElement("code");
-            code.className = "json";
-            let jsonText = JSON.stringify(data.endpoints[key], null, 4);
-            CodeMirror.runMode(jsonText, "application/json", code);
-            pre.appendChild(code);
-            tdContent.appendChild(pre);
-            
-            let tdActions = document.createElement("td");
-            let editBtn = document.createElement("button");
-            editBtn.innerText = "编辑";
-            editBtn.className = "btn";
-            editBtn.onclick = function() {
-              document.getElementById("endpoint-key").value = key;
-              document.getElementById("endpoint-content").value = JSON.stringify(data.endpoints[key], null, 4);
-            };
-            let deleteBtn = document.createElement("button");
-            deleteBtn.innerText = "删除";
-            deleteBtn.className = "btn";
-            deleteBtn.onclick = function() {
-              if(confirm("确认删除 endpoints " + key + " 吗？")) {
-                deleteEndpoint(key);
-              }
-            };
-            tdActions.appendChild(editBtn);
-            tdActions.appendChild(deleteBtn);
-            tr.appendChild(tdKey);
-            tr.appendChild(tdContent);
-            tr.appendChild(tdActions);
-            tbody.appendChild(tr);
-          }
-        } else {
-          alert("加载 endpoints 失败：" + data.error);
-        }
-      })
-      .catch(err => console.error("加载 endpoints 错误:", err));
-    }
-
-    function saveEndpoint() {
-      let key = document.getElementById("endpoint-key").value.trim();
-      let content = document.getElementById("endpoint-content").value.trim();
-      if(!key || !content) {
-        alert("❌ Key 和内容不能为空！");
-        return;
-      }
-      let endpointData;
-      try {
-        endpointData = JSON.parse(content);
-      } catch(e) {
-        alert("❌ Endpoints 内容不是有效的 JSON 格式");
-        return;
-      }
-      // 统一使用 update 操作（若 key 不存在则相当于添加）
-      fetch('endpoints_manager.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({action: 'update', key: key, data: endpointData})
-      })
-      .then(response => response.json())
-      .then(data => {
-        if(data.success) {
-          alert("✅ Endpoints 保存成功！");
-          loadEndpoints();
-          clearEndpointForm();
-        } else {
-          alert("❌ 保存失败：" + data.error);
-        }
-      })
-      .catch(err => console.error("保存 endpoints 错误:", err));
-    }
-
-    function deleteEndpoint(key) {
-      fetch('endpoints_manager.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({action: 'delete', key: key})
-      })
-      .then(response => response.json())
-      .then(data => {
-        if(data.success) {
-          alert("✅ Endpoints 删除成功！");
-          loadEndpoints();
-        } else {
-          alert("❌ 删除失败：" + data.error);
-        }
-      })
-      .catch(err => console.error("删除 endpoints 错误:", err));
-    }
-
-    function clearEndpointForm() {
-      document.getElementById("endpoint-key").value = "";
-      document.getElementById("endpoint-content").value = "";
-    }
-
-    // 历史版本管理相关
-    function loadHistory() {
-      fetch('get_history.php')
-      .then(response => response.json())
-      .then(data => {
-        if(data.success) {
-          let tbody = document.querySelector("#history-table tbody");
-          tbody.innerHTML = "";
-          data.history.forEach(item => {
-            let tr = document.createElement("tr");
-            let tdFile = document.createElement("td");
-            tdFile.innerText = item;
-            let tdActions = document.createElement("td");
-            let restoreBtn = document.createElement("button");
-            restoreBtn.innerText = "恢复";
-            restoreBtn.className = "btn";
-            restoreBtn.onclick = function() {
-              if(confirm("确认恢复 " + item + " 的版本吗？")) {
-                restoreHistory(item);
-              }
-            };
-            let deleteBtn = document.createElement("button");
-            deleteBtn.innerText = "删除";
-            deleteBtn.className = "btn";
-            deleteBtn.onclick = function() {
-              if(confirm("确认删除历史版本 " + item + " 吗？")) {
-                deleteHistory(item);
-              }
-            };
-            tdActions.appendChild(restoreBtn);
-            tdActions.appendChild(deleteBtn);
-            tr.appendChild(tdFile);
-            tr.appendChild(tdActions);
-            tbody.appendChild(tr);
+      
+      function initEndpointEditor() {
+        if (!endpointEditor) {
+          const editorElement = document.getElementById('endpoint-content');
+          endpointEditor = CodeMirror.fromTextArea(editorElement, {
+            mode: 'application/json',
+            lineNumbers: true,
+            matchBrackets: true,
+            autoCloseBrackets: true,
+            theme: isDarkMode ? 'material-darker' : 'eclipse',
+            tabSize: 2,
+            lineWrapping: true,
+            viewportMargin: Infinity
           });
-        } else {
-          alert("加载历史版本失败：" + data.error);
         }
-      })
-      .catch(err => console.error("加载历史版本错误:", err));
-    }
-
-    function restoreHistory(fileName) {
-      fetch('restore_history.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({file: fileName})
-      })
-      .then(response => response.json())
-      .then(data => {
-        if(data.success) {
-          alert("✅ 配置已恢复为 " + fileName);
-          loadConfig();
-          loadHistory();
-        } else {
-          alert("❌ 恢复失败：" + data.error);
+      }
+      
+      // Fullscreen mode
+      function enterFullscreenMode(source) {
+        currentFullscreenSource = source;
+        isInFullscreenMode = true;
+        
+        fullscreenEditorElement.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        
+        const contentContainer = document.getElementById('fullscreen-editor-container');
+        const textarea = document.createElement('textarea');
+        contentContainer.innerHTML = '';
+        contentContainer.appendChild(textarea);
+        
+        // Set the title based on the source
+        document.getElementById('fullscreen-title').textContent = 
+          source === 'config' ? '配置编辑' : 'Endpoints 编辑';
+        
+        // Initialize editor with content from source
+        if (source === 'config') {
+          textarea.value = configEditor.getValue();
+        } else if (source === 'endpoint') {
+          textarea.value = endpointEditor.getValue();
         }
-      })
-      .catch(err => console.error("恢复历史版本错误:", err));
-    }
-
-    function deleteHistory(fileName) {
-      fetch('delete_history.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({file: fileName})
-      })
-      .then(response => response.json())
-      .then(data => {
-        if(data.success) {
-          alert("✅ 历史版本删除成功！");
-          loadHistory();
-        } else {
-          alert("❌ 删除失败：" + data.error);
+        
+        fullscreenEditor = CodeMirror.fromTextArea(textarea, {
+          mode: 'application/json',
+          lineNumbers: true,
+          matchBrackets: true,
+          autoCloseBrackets: true,
+          theme: isDarkMode ? 'material-darker' : 'eclipse',
+          tabSize: 2,
+          lineWrapping: true,
+          viewportMargin: Infinity
+        });
+        
+        // Set desktop font size for the fullscreen editor
+        if (!isMobile) {
+          fullscreenEditor.getWrapperElement().style.fontSize = '14px';
         }
-      })
-      .catch(err => console.error("删除历史版本错误:", err));
-    }
+        
+        // Ensure CodeMirror is properly sized and rendered
+        setTimeout(() => fullscreenEditor.refresh(), 10);
+        
+        // Update button states
+        document.getElementById('fullscreen-save-btn').disabled = source !== 'config';
+      }
+      
+      function exitFullscreenMode() {
+        if (!isInFullscreenMode) return;
+        
+        // Transfer content back to original editor
+        if (currentFullscreenSource === 'config' && configEditor) {
+          configEditor.setValue(fullscreenEditor.getValue());
+        } else if (currentFullscreenSource === 'endpoint' && endpointEditor) {
+          endpointEditor.setValue(fullscreenEditor.getValue());
+        }
+        
+        // Hide fullscreen editor
+        fullscreenEditorElement.classList.add('hidden');
+        document.body.style.overflow = '';
+        
+        isInFullscreenMode = false;
+        currentFullscreenSource = null;
+      }
+      
+      // API functions
+      function login() {
+        const password = document.getElementById('login-password').value;
+        
+        if (!password) {
+          showToast('请输入密码', 'error');
+          return;
+        }
+        
+        showLoader();
+        
+        fetch('login.php', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({password: password})
+        })
+        .then(response => response.json())
+        .then(data => {
+          hideLoader();
+          if (data.success) {
+            loginSection.classList.add('hidden');
+            mainSection.classList.remove('hidden');
+            mainSection.classList.add('fade-in');
+            
+            // Initialize the app
+            loadConfig();
+            loadRawEndpoints();
+            showToast('登录成功');
+          } else {
+            showToast('登录失败，密码错误', 'error');
+            
+            // Add shake animation to password input
+            const passwordInput = document.getElementById('login-password');
+            passwordInput.classList.add('animate__animated', 'animate__shakeX');
+            setTimeout(() => {
+              passwordInput.classList.remove('animate__animated', 'animate__shakeX');
+            }, 1000);
+          }
+        })
+        .catch(err => {
+          hideLoader();
+          console.error("登录错误:", err);
+          showToast('登录出错，请重试', 'error');
+        });
+      }
+      
+      function loadConfig() {
+        showLoader();
+        
+        fetch('get_config.php')
+        .then(response => response.json())
+        .then(data => {
+          hideLoader();
+          
+          // Initialize the editor if needed
+          initConfigEditor();
+          
+          // Set the config content
+          currentConfig = JSON.stringify(data, null, 2);
+          configEditor.setValue(currentConfig);
+          
+          // Set desktop font size
+          if (!isMobile) {
+            configEditor.getWrapperElement().style.fontSize = '14px';
+          }
+          
+          // Refresh to ensure proper rendering
+          setTimeout(() => configEditor.refresh(), 10);
+        })
+        .catch(err => {
+          hideLoader();
+          console.error("加载配置错误:", err);
+          showToast('加载配置出错', 'error');
+        });
+      }
+      
+      function saveConfig() {
+        // Get the content from the appropriate editor
+        let configData;
+        
+        if (isInFullscreenMode && currentFullscreenSource === 'config') {
+          configData = fullscreenEditor.getValue();
+        } else {
+          configData = configEditor.getValue();
+        }
+        
+        // Validate JSON
+        try {
+          JSON.parse(configData);
+        } catch(e) {
+          showToast('配置内容不是有效的 JSON 格式', 'error');
+          return;
+        }
+        
+        showLoader();
+        
+        fetch('save_json.php', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({json: configData})
+        })
+        .then(response => response.json())
+        .then(data => {
+          hideLoader();
+          
+          if (data.success) {
+            showToast('配置保存成功');
+            loadConfig();
+            
+            // Exit fullscreen mode if active
+            if (isInFullscreenMode) {
+              exitFullscreenMode();
+            }
+          } else {
+            showToast('保存失败：' + data.error, 'error');
+          }
+        })
+        .catch(err => {
+          hideLoader();
+          console.error("保存配置错误:", err);
+          showToast('保存配置出错', 'error');
+        });
+      }
+      
+      function formatConfig() {
+        let configData;
+        
+        if (isInFullscreenMode && currentFullscreenSource === 'config') {
+          configData = fullscreenEditor.getValue();
+        } else if (isInFullscreenMode && currentFullscreenSource === 'endpoint') {
+          configData = fullscreenEditor.getValue();
+        } else if (currentFullscreenSource === null && document.getElementById('config-tab').classList.contains('active')) {
+          configData = configEditor.getValue();
+        } else if (currentFullscreenSource === null && document.getElementById('endpoints-tab').classList.contains('active')) {
+          configData = endpointEditor.getValue();
+        }
+        
+        try {
+          let parsed = JSON.parse(configData);
+          let formatted = JSON.stringify(parsed, null, 2);
+          
+          if (isInFullscreenMode) {
+            fullscreenEditor.setValue(formatted);
+          } else if (document.getElementById('config-tab').classList.contains('active')) {
+            configEditor.setValue(formatted);
+          } else if (document.getElementById('endpoints-tab').classList.contains('active')) {
+            endpointEditor.setValue(formatted);
+          }
+          
+          showToast('JSON 格式化成功');
+        } catch(e) {
+          showToast('当前内容不是有效的 JSON 格式，无法格式化', 'error');
+        }
+      }
+      
+      function uploadConfig() {
+        const fileInput = document.getElementById('upload-config');
+        
+        if (fileInput.files.length === 0) {
+          showToast('请选择一个配置文件进行上传', 'error');
+          return;
+        }
+        
+        const file = fileInput.files[0];
+        const formData = new FormData();
+        formData.append('jsonFile', file);
+        
+        showLoader();
+        
+        fetch('upload_json.php', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          hideLoader();
+          
+          if (data.success) {
+            showToast('配置文件上传成功');
+            loadConfig();
+            
+            // Clear file input
+            fileInput.value = '';
+            document.getElementById('file-name-display').classList.remove('active');
+          } else {
+            showToast('上传失败：' + data.error, 'error');
+          }
+        })
+        .catch(err => {
+          hideLoader();
+          console.error("上传配置错误:", err);
+          showToast('上传配置出错', 'error');
+        });
+      }
+      
+      function loadRawEndpoints() {
+        showLoader();
+        
+        fetch('endpoints_manager.php', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({action: 'list'})
+        })
+        .then(response => response.json())
+        .then(data => {
+          hideLoader();
+          
+          if (data.success) {
+            const select = document.getElementById('raw-endpoint');
+            select.innerHTML = '<option value="">不替换</option>';
+            
+            for (let key in data.endpoints) {
+              const option = document.createElement('option');
+              option.value = key;
+              option.textContent = key;
+              select.appendChild(option);
+            }
+          } else {
+            console.error("加载 Raw endpoints 失败：" + data.error);
+            showToast('加载 Endpoints 列表失败', 'error');
+          }
+        })
+        .catch(err => {
+          hideLoader();
+          console.error("加载 Raw endpoints 错误:", err);
+          showToast('加载 Endpoints 列表出错', 'error');
+        });
+      }
+      
+      function generateRawLink() {
+        const rawPwd = document.getElementById('raw-password').value;
+        
+        if (!rawPwd) {
+          showToast('请输入 Raw 访问密码', 'error');
+          return;
+        }
+        
+        // Generate link with selected endpoint
+        let rawLink = "https://sing-box.200502.xyz/raw.php?pwd=" + encodeURIComponent(rawPwd) + "&file=config.json";
+        const selectedEp = document.getElementById('raw-endpoint').value;
+        
+        if (selectedEp) {
+          rawLink += "&ep=" + encodeURIComponent(selectedEp);
+        }
+        
+        // Display the link
+        const linkDisplay = document.getElementById('raw-link-display');
+        linkDisplay.style.display = 'block';
+        linkDisplay.querySelector('div').textContent = rawLink;
+        
+        // Add animation
+        linkDisplay.classList.add('fade-in');
+        setTimeout(() => linkDisplay.classList.remove('fade-in'), 500);
+        
+        showToast('Raw 链接生成成功');
+      }
+      
+      function loadEndpoints() {
+        showLoader();
+        
+        fetch('endpoints_manager.php', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({action: 'list'})
+        })
+        .then(response => response.json())
+        .then(data => {
+          hideLoader();
+          
+          if (data.success) {
+            // Update desktop table view
+            const tbody = document.querySelector('#endpoints-table tbody');
+            tbody.innerHTML = '';
+            
+            // Update mobile card view
+            const cardsContainer = document.getElementById('endpoints-cards');
+            cardsContainer.innerHTML = '';
+            
+            if (Object.keys(data.endpoints).length === 0) {
+              // Handle empty data for desktop
+              const tr = document.createElement('tr');
+              const td = document.createElement('td');
+              td.colSpan = 3;
+              td.className = 'text-center';
+              td.textContent = '暂无数据';
+              tr.appendChild(td);
+              tbody.appendChild(tr);
+              
+              // Handle empty data for mobile
+              cardsContainer.innerHTML = '<div class="text-center">暂无数据</div>';
+              return;
+            }
+            
+            let animationDelay = 0;
+            
+            for (let key in data.endpoints) {
+              // Create formatted JSON content
+              const jsonText = JSON.stringify(data.endpoints[key], null, 2);
+              
+              // Desktop view row
+              const tr = document.createElement('tr');
+              tr.classList.add('fade-in-up');
+              tr.style.animationDelay = `${animationDelay}s`;
+              
+              // Key cell
+              const tdKey = document.createElement('td');
+              tdKey.textContent = key;
+              
+              // Content cell with code highlighting
+              const tdContent = document.createElement('td');
+              const pre = document.createElement('pre');
+              pre.style.backgroundColor = isDarkMode ? '#1a1a1a' : '#f6f8fa';
+              pre.style.borderRadius = '4px';
+              pre.style.padding = '8px';
+              pre.style.maxHeight = '150px';
+              pre.style.overflowX = 'auto';
+              
+              const code = document.createElement('code');
+              code.className = 'json';
+              
+              // Format and highlight JSON
+              CodeMirror.runMode(jsonText, 'application/json', code);
+              
+              pre.appendChild(code);
+              tdContent.appendChild(pre);
+              
+              // Actions cell
+              const tdActions = document.createElement('td');
+              const btnGroup = document.createElement('div');
+              btnGroup.className = 'd-flex gap-sm';
+              
+              // Edit button
+              const editBtn = document.createElement('button');
+              editBtn.className = 'action-btn edit';
+              editBtn.textContent = '编辑';
+              editBtn.onclick = function() {
+                editEndpoint(key, data.endpoints[key]);
+              };
+              
+              // Delete button
+              const deleteBtn = document.createElement('button');
+              deleteBtn.className = 'action-btn delete';
+              deleteBtn.textContent = '删除';
+              deleteBtn.onclick = function() {
+                if (confirm(`确认删除 endpoints "${key}" 吗？`)) {
+                  deleteEndpoint(key);
+                }
+              };
+              
+              btnGroup.appendChild(editBtn);
+              btnGroup.appendChild(deleteBtn);
+              tdActions.appendChild(btnGroup);
+              
+              // Append cells to row
+              tr.appendChild(tdKey);
+              tr.appendChild(tdContent);
+              tr.appendChild(tdActions);
+              tbody.appendChild(tr);
+              
+              // Mobile card view
+              const card = document.createElement('div');
+              card.className = 'data-card fade-in-up';
+              card.style.animationDelay = `${animationDelay}s`;
+              
+              const cardHeader = document.createElement('div');
+              cardHeader.className = 'data-card-header';
+              
+              const cardTitle = document.createElement('h4');
+              cardTitle.className = 'data-card-title';
+              cardTitle.textContent = key;
+              cardHeader.appendChild(cardTitle);
+              
+              const cardContent = document.createElement('div');
+              cardContent.className = 'data-card-content';
+              
+              const codeContent = document.createElement('div');
+              codeContent.className = 'code-content';
+              
+              // Truncate JSON content for mobile display
+              let displayJson = jsonText;
+              if (displayJson.length > 200) {
+                displayJson = displayJson.substring(0, 200) + '...';
+              }
+              codeContent.textContent = displayJson;
+              
+              cardContent.appendChild(codeContent);
+              
+              const cardActions = document.createElement('div');
+              cardActions.className = 'data-card-actions';
+              
+              // Clone the buttons for mobile
+              const mobileEditBtn = document.createElement('button');
+              mobileEditBtn.className = 'btn btn-sm';
+              mobileEditBtn.textContent = '编辑';
+              mobileEditBtn.onclick = function() {
+                editEndpoint(key, data.endpoints[key]);
+              };
+              
+              const mobileDeleteBtn = document.createElement('button');
+              mobileDeleteBtn.className = 'btn btn-sm btn-danger';
+              mobileDeleteBtn.textContent = '删除';
+              mobileDeleteBtn.onclick = function() {
+                if (confirm(`确认删除 endpoints "${key}" 吗？`)) {
+                  deleteEndpoint(key);
+                }
+              };
+              
+              cardActions.appendChild(mobileEditBtn);
+              cardActions.appendChild(mobileDeleteBtn);
+              
+              card.appendChild(cardHeader);
+              card.appendChild(cardContent);
+              card.appendChild(cardActions);
+              
+              cardsContainer.appendChild(card);
+              
+              animationDelay += 0.05;
+            }
+            
+            // Remove animation classes after animation completes
+            setTimeout(() => {
+              document.querySelectorAll('#endpoints-table tbody tr, .data-card').forEach(el => {
+                el.classList.remove('fade-in-up');
+              });
+            }, 1000);
+          } else {
+            showToast('加载 endpoints 失败：' + data.error, 'error');
+          }
+        })
+        .catch(err => {
+          hideLoader();
+          console.error("加载 endpoints 错误:", err);
+          showToast('加载 endpoints 出错', 'error');
+        });
+      }
+      
+      function editEndpoint(key, data) {
+        document.getElementById('endpoint-key').value = key;
+        
+        const jsonContent = JSON.stringify(data, null, 2);
+        
+        if (endpointEditor) {
+          endpointEditor.setValue(jsonContent);
+          // Set desktop font size
+          if (!isMobile) {
+            endpointEditor.getWrapperElement().style.fontSize = '14px';
+          }
+          setTimeout(() => endpointEditor.refresh(), 10);
+        } else {
+          initEndpointEditor();
+          endpointEditor.setValue(jsonContent);
+        }
+        
+        // Scroll to editor form
+        document.querySelector('#endpoints-tab .card:nth-child(2)').scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }
+      
+      function saveEndpoint() {
+        const key = document.getElementById('endpoint-key').value.trim();
+        let content;
+        
+        if (endpointEditor) {
+          content = endpointEditor.getValue().trim();
+        } else {
+          content = document.getElementById('endpoint-content').value.trim();
+        }
+        
+        if (!key || !content) {
+          showToast('Key 和内容不能为空', 'error');
+          return;
+        }
+        
+        // Validate JSON
+        let endpointData;
+        try {
+          endpointData = JSON.parse(content);
+        } catch(e) {
+          showToast('Endpoints 内容不是有效的 JSON 格式', 'error');
+          return;
+        }
+        
+        showLoader();
+        
+        fetch('endpoints_manager.php', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({action: 'update', key: key, data: endpointData})
+        })
+        .then(response => response.json())
+        .then(data => {
+          hideLoader();
+          
+          if (data.success) {
+            showToast('Endpoints 保存成功');
+            loadEndpoints();
+            clearEndpointForm();
+          } else {
+            showToast('保存失败：' + data.error, 'error');
+          }
+        })
+        .catch(err => {
+          hideLoader();
+          console.error("保存 endpoints 错误:", err);
+          showToast('保存 endpoints 出错', 'error');
+        });
+      }
+      
+      function deleteEndpoint(key) {
+        showLoader();
+        
+        fetch('endpoints_manager.php', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({action: 'delete', key: key})
+        })
+        .then(response => response.json())
+        .then(data => {
+          hideLoader();
+          
+          if (data.success) {
+            showToast('Endpoints 删除成功');
+            loadEndpoints();
+          } else {
+            showToast('删除失败：' + data.error, 'error');
+          }
+        })
+        .catch(err => {
+          hideLoader();
+          console.error("删除 endpoints 错误:", err);
+          showToast('删除 endpoints 出错', 'error');
+        });
+      }
+      
+      function clearEndpointForm() {
+        document.getElementById('endpoint-key').value = '';
+        
+        if (endpointEditor) {
+          endpointEditor.setValue('');
+        } else {
+          document.getElementById('endpoint-content').value = '';
+        }
+        
+        showToast('表单已清空');
+      }
+      
+      function loadHistory() {
+        showLoader();
+        
+        fetch('get_history.php')
+        .then(response => response.json())
+        .then(data => {
+          hideLoader();
+          
+          if (data.success) {
+            // Update desktop table view
+            const tbody = document.querySelector('#history-table tbody');
+            tbody.innerHTML = '';
+            
+            // Update mobile card view
+            const cardsContainer = document.getElementById('history-cards');
+            cardsContainer.innerHTML = '';
+            
+            if (data.history.length === 0) {
+              // Handle empty data for desktop
+              const tr = document.createElement('tr');
+              const td = document.createElement('td');
+              td.colSpan = 2;
+              td.className = 'text-center';
+              td.textContent = '暂无历史版本';
+              tr.appendChild(td);
+              tbody.appendChild(tr);
+              
+              // Handle empty data for mobile
+              cardsContainer.innerHTML = '<div class="text-center">暂无历史版本</div>';
+              return;
+            }
+            
+            let animationDelay = 0;
+            
+            data.history.forEach(item => {
+              // Desktop table row
+              const tr = document.createElement('tr');
+              tr.classList.add('fade-in-up');
+              tr.style.animationDelay = `${animationDelay}s`;
+              
+              // Filename cell
+              const tdFile = document.createElement('td');
+              tdFile.textContent = item;
+              
+              // Actions cell
+              const tdActions = document.createElement('td');
+              const btnGroup = document.createElement('div');
+              btnGroup.className = 'd-flex gap-sm';
+              
+              // Restore button
+              const restoreBtn = document.createElement('button');
+              restoreBtn.className = 'action-btn edit';
+              restoreBtn.textContent = '恢复';
+              restoreBtn.onclick = function() {
+                if (confirm(`确认恢复 "${item}" 的版本吗？`)) {
+                  restoreHistory(item);
+                }
+              };
+              
+              // Delete button
+              const deleteBtn = document.createElement('button');
+              deleteBtn.className = 'action-btn delete';
+              deleteBtn.textContent = '删除';
+              deleteBtn.onclick = function() {
+                if (confirm(`确认删除历史版本 "${item}" 吗？`)) {
+                  deleteHistory(item);
+                }
+              };
+              
+              btnGroup.appendChild(restoreBtn);
+              btnGroup.appendChild(deleteBtn);
+              tdActions.appendChild(btnGroup);
+              
+              // Append cells to row
+              tr.appendChild(tdFile);
+              tr.appendChild(tdActions);
+              tbody.appendChild(tr);
+              
+              // Mobile card view
+              const card = document.createElement('div');
+              card.className = 'data-card fade-in-up';
+              card.style.animationDelay = `${animationDelay}s`;
+              
+              // Card header with filename
+              const cardHeader = document.createElement('div');
+              cardHeader.className = 'data-card-header';
+              
+              const cardTitle = document.createElement('h4');
+              cardTitle.className = 'data-card-title';
+              cardTitle.textContent = item;
+              cardHeader.appendChild(cardTitle);
+              
+              // Card actions
+              const cardActions = document.createElement('div');
+              cardActions.className = 'data-card-actions';
+              
+              // Clone the buttons for mobile
+              const mobileRestoreBtn = document.createElement('button');
+              mobileRestoreBtn.className = 'btn btn-sm';
+              mobileRestoreBtn.textContent = '恢复';
+              mobileRestoreBtn.onclick = function() {
+                if (confirm(`确认恢复 "${item}" 的版本吗？`)) {
+                  restoreHistory(item);
+                }
+              };
+              
+              const mobileDeleteBtn = document.createElement('button');
+              mobileDeleteBtn.className = 'btn btn-sm btn-danger';
+              mobileDeleteBtn.textContent = '删除';
+              mobileDeleteBtn.onclick = function() {
+                if (confirm(`确认删除历史版本 "${item}" 吗？`)) {
+                  deleteHistory(item);
+                }
+              };
+              
+              cardActions.appendChild(mobileRestoreBtn);
+              cardActions.appendChild(mobileDeleteBtn);
+              
+              card.appendChild(cardHeader);
+              card.appendChild(cardActions);
+              
+              cardsContainer.appendChild(card);
+              
+              animationDelay += 0.05;
+            });
+            
+            // Remove animation classes after animation completes
+            setTimeout(() => {
+              document.querySelectorAll('#history-table tbody tr, .data-card').forEach(el => {
+                el.classList.remove('fade-in-up');
+              });
+            }, 1000);
+          } else {
+            showToast('加载历史版本失败：' + data.error, 'error');
+          }
+        })
+        .catch(err => {
+          hideLoader();
+          console.error("加载历史版本错误:", err);
+          showToast('加载历史版本出错', 'error');
+        });
+      }
+      
+      function restoreHistory(fileName) {
+        showLoader();
+        
+        fetch('restore_history.php', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({file: fileName})
+        })
+        .then(response => response.json())
+        .then(data => {
+          hideLoader();
+          
+          if (data.success) {
+            showToast(`配置已恢复为 "${fileName}"`);
+            loadConfig();
+            loadHistory();
+            
+            // Switch to config tab
+            switchTab('config');
+          } else {
+            showToast('恢复失败：' + data.error, 'error');
+          }
+        })
+        .catch(err => {
+          hideLoader();
+          console.error("恢复历史版本错误:", err);
+          showToast('恢复历史版本出错', 'error');
+        });
+      }
+      
+      function deleteHistory(fileName) {
+        showLoader();
+        
+        fetch('delete_history.php', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({file: fileName})
+        })
+        .then(response => response.json())
+        .then(data => {
+          hideLoader();
+          
+          if (data.success) {
+            showToast('历史版本删除成功');
+            loadHistory();
+          } else {
+            showToast('删除失败：' + data.error, 'error');
+          }
+        })
+        .catch(err => {
+          hideLoader();
+          console.error("删除历史版本错误:", err);
+          showToast('删除历史版本出错', 'error');
+        });
+      }
+      
+      // Initialize theme
+      initTheme();
+      
+      // Add event listeners
+      document.getElementById('login-btn').addEventListener('click', login);
+      
+      // Login on Enter key
+      document.getElementById('login-password').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') login();
+      });
+      
+      // Theme toggle
+      themeToggle.addEventListener('click', toggleTheme);
+      
+      // Tab switching
+      mainTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          const tabId = this.getAttribute('data-tab');
+          switchTab(tabId);
+        });
+      });
+      
+      // Config actions
+      document.getElementById('save-config-btn').addEventListener('click', saveConfig);
+      document.getElementById('format-config-btn').addEventListener('click', formatConfig);
+      document.getElementById('upload-config-btn').addEventListener('click', uploadConfig);
+      document.getElementById('generate-raw-link-btn').addEventListener('click', generateRawLink);
+      
+      // Endpoint actions
+      document.getElementById('refresh-endpoints-btn').addEventListener('click', loadEndpoints);
+      document.getElementById('save-endpoint-btn').addEventListener('click', saveEndpoint);
+      document.getElementById('clear-endpoint-btn').addEventListener('click', clearEndpointForm);
+      
+      // History actions
+      document.getElementById('refresh-history-btn').addEventListener('click', loadHistory);
+      
+      // Fullscreen editor actions
+      document.getElementById('config-fullscreen').addEventListener('click', () => enterFullscreenMode('config'));
+      document.getElementById('endpoint-fullscreen').addEventListener('click', () => enterFullscreenMode('endpoint'));
+      document.getElementById('exit-fullscreen-btn').addEventListener('click', exitFullscreenMode);
+      document.getElementById('fullscreen-save-btn').addEventListener('click', saveConfig);
+      document.getElementById('fullscreen-format-btn').addEventListener('click', formatConfig);
+      
+      // Mobile action bar
+      document.getElementById('mobile-save-btn').addEventListener('click', saveConfig);
+      document.getElementById('mobile-format-btn').addEventListener('click', formatConfig);
+      document.getElementById('mobile-fullscreen-btn').addEventListener('click', () => enterFullscreenMode('config'));
+      
+      // Prevent accidental zooming on mobile
+      document.addEventListener('dblclick', function(e) {
+        e.preventDefault();
+      }, { passive: false });
+      
+      // Handle window resize
+      window.addEventListener('resize', function() {
+        if (configEditor) configEditor.refresh();
+        if (endpointEditor) endpointEditor.refresh();
+        if (fullscreenEditor) fullscreenEditor.refresh();
+        
+        // Update mobile action bar visibility
+        if (isMobile) {
+          mobileActionBar.classList.toggle('active', document.getElementById('config-tab').classList.contains('active'));
+        }
+        
+        // Toggle mobile/desktop views based on screen size
+        const isMobileView = window.innerWidth <= 768;
+        document.querySelectorAll('.mobile-hide').forEach(el => {
+          el.style.display = isMobileView ? 'none' : 'block';
+        });
+        document.querySelectorAll('.mobile-show').forEach(el => {
+          el.style.display = isMobileView ? 'block' : 'none';
+        });
+      });
+    });
   </script>
 </body>
 </html>
